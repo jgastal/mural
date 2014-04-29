@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 )
 
 func hello(resp http.ResponseWriter, req *http.Request) {
-	resp.Write([]byte("<html><body><h1>Hello world!</h1></body></html>"))
+	fmt.Println("<html><body><h1>")
+	resp.Write([]byte("Hello world!"))
+	fmt.Println("</h1></body></html>")
 }
 
 func main() {
