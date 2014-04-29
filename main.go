@@ -7,10 +7,9 @@ import (
 )
 
 func hello(resp http.ResponseWriter, req *http.Request) {
-	fmt.Println("<html><head><title>How about them apples?!</title></head><body><h1>")
-	fmt.Println("Hello world!")
-// 	resp.Write([]byte("Hello world!"))
-	fmt.Println("</h1></body></html>")
+	fmt.Println(res, "<html><head><title>How about them apples?!</title></head><body><h1>")
+	fmt.Println(res, "Hello world!")
+	fmt.Println(res, "</h1></body></html>")
 }
 
 func main() {
