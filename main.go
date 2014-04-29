@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 )
 
 func hello(resp http.ResponseWriter, req *http.Request) {
@@ -10,7 +11,7 @@ func hello(resp http.ResponseWriter, req *http.Request) {
 
 func main() {
 	http.HandleFunc("/", hello)
-	err := http.ListenAndServe(":80", nil)
+	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
 		panic(err)
 	}
