@@ -1,0 +1,13 @@
+<html>
+	<head>
+		<title>{{.title}}</title>
+	</head>
+	<body>
+		{{if .ps}}<h1>{{.ps}}</h1>{{end}}
+		<ul>
+			{{range .envs}}
+				<li>{{.}}</li>
+			{{end}}
+		</ul>
+	</body>
+</html>

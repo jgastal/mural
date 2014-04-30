@@ -1,13 +1,24 @@
 package main
 
 import (
+	"database/sql"
+	"github.com/lib/pq"
 	"html/template"
 	"net/http"
 	"os"
 )
 
 func hello(resp http.ResponseWriter, req *http.Request) {
-	content, err := template.New("").Parse("<html><head><title>{{.title}}</title></head><body><ul>{{range .envs}}<li>{{.}}</li>{{end}}</ul></body></html>")
+	conn_params, err := pq.ParseURL(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		panic(err)
+	}
+	conn, err := sql.Open("postgres", conn_params)
+	if err != nil {
+		panic(err)
+	}
+
+	home, err := template.ParseFiles("home.html")
 	if err != nil {
 		panic(err)
 	}
@@ -16,8 +27,13 @@ func hello(resp http.ResponseWriter, req *http.Request) {
 		"title": "How about them apples?!",
 		"envs":  os.Environ(),
 	}
+	if conn.Ping() != nil {
+		ctx["ps"] = "I connected to the database! YAY!"
+	} else {
+		ctx["ps"] = "I can't connect to the database! WTF?!"
+	}
 
-	content.Execute(resp, ctx)
+	home.Execute(resp, ctx)
 }
 
 func main() {
