@@ -1,15 +1,23 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 )
 
 func hello(resp http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(resp, "<html><head><title>How about them apples?!</title></head><body><h1>")
-	fmt.Fprintln(resp, "Hello world!")
-	fmt.Fprintln(resp, "</h1></body></html>")
+	content, err := template.New("").Parse("<html><head><title>{{.title}}</title></head><body><ul>{{range .envs}}<li>{{.}}</li>{{end}}</ul></body></html>")
+	if err != nil {
+		panic(err)
+	}
+
+	ctx := map[string]interface{} {
+		"title": "How about them apples?!",
+		"envs": os.Environ(),
+	}
+
+	content.Execute(resp, ctx)
 }
 
 func main() {
