@@ -27,7 +27,7 @@ func hello(resp http.ResponseWriter, req *http.Request) {
 		"title": "How about them apples?!",
 		"envs":  os.Environ(),
 	}
-	if conn.Ping() != nil {
+	if conn.Ping() == nil {
 		ctx["ps"] = "I connected to the database! YAY!"
 	} else {
 		ctx["ps"] = "I can't connect to the database! WTF?!"
