@@ -42,7 +42,6 @@ func home(resp http.ResponseWriter, req *http.Request) {
 
 	ctx := map[string]interface{}{
 		"title": "How about them apples?!",
-		"envs":  os.Environ(),
 	}
 
 	home.Execute(resp, ctx)
