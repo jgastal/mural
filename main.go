@@ -8,17 +8,22 @@ import (
 	"os"
 )
 
-func home(resp http.ResponseWriter, req *http.Request) {
-	if req.Method == "POST" {
-		conn_params, err := pq.ParseURL(os.Getenv("DATABASE_URL"))
-		if err != nil {
-			panic(err)
-		}
-		conn, err := sql.Open("postgres", conn_params)
-		if err != nil {
-			panic(err)
-		}
+type message struct {
+	Name string
+	Message string
+}
 
+func home(resp http.ResponseWriter, req *http.Request) {
+	conn_params, err := pq.ParseURL(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		panic(err)
+	}
+	conn, err := sql.Open("postgres", conn_params)
+	if err != nil {
+		panic(err)
+	}
+
+	if req.Method == "POST" {
 		name := req.FormValue("name")
 		if name == "" {
 			name = "Anonymous coward"
@@ -31,8 +36,6 @@ func home(resp http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-
-		conn.Close()
 	}
 
 	home, err := template.ParseFiles("home.html")
@@ -40,8 +43,27 @@ func home(resp http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
+	var messages [10]message
+	msg_count := 0
+	rows, err := conn.Query("SELECT name, message FROM posts ORDER BY id DESC LIMIT 10");
+	if err != nil {
+		panic(err)
+	}
+	for rows.Next() {
+		var name, msg string
+		err = rows.Scan(&name, &msg)
+		if err != nil {
+			//TODO log error
+			continue
+		}
+		messages[msg_count] = message{name, msg}
+		msg_count += 1
+	}
+	conn.Close()
+
 	ctx := map[string]interface{}{
 		"title": "How about them apples?!",
+		"messages": messages[:msg_count],
 	}
 
 	home.Execute(resp, ctx)
