@@ -5,11 +5,13 @@ import (
 	"labix.org/v2/mgo"
 	"net/http"
 	"os"
+	"time"
 )
 
 type message struct {
 	Name string
 	Message string
+	Time time.Time
 }
 
 func home(resp http.ResponseWriter, req *http.Request) {
@@ -29,7 +31,7 @@ func home(resp http.ResponseWriter, req *http.Request) {
 		if msg == "" {
 			msg = "Gosh, nothing to say?!"
 		}
-		err = collection.Insert(message{name, msg})
+		err = collection.Insert(message{name, msg, time.Now()})
 		if err != nil {
 			panic(err)
 		}
@@ -42,7 +44,7 @@ func home(resp http.ResponseWriter, req *http.Request) {
 
 	var messages [10]message
 	msg_count := 0
-	iter := collection.Find(nil).Batch(10).Iter()
+	iter := collection.Find(nil).Sort("-time").Batch(10).Iter()
 	for iter.Next(&messages[msg_count]) && msg_count < 10 {
 		msg_count += 1
 	}
