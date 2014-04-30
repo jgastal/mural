@@ -12,9 +12,9 @@ func hello(resp http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	ctx := map[string]interface{} {
+	ctx := map[string]interface{}{
 		"title": "How about them apples?!",
-		"envs": os.Environ(),
+		"envs":  os.Environ(),
 	}
 
 	content.Execute(resp, ctx)
