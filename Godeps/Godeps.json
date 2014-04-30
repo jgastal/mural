@@ -3,8 +3,9 @@
 	"GoVersion": "go1.2.1",
 	"Deps": [
 		{
-			"ImportPath": "github.com/lib/pq",
-			"Rev": "c808a1bb644594ca717ac61f71e6b0e454b835e2"
+			"ImportPath": "labix.org/v2/mgo",
+			"Comment": "274",
+			"Rev": "gustavo@niemeyer.net-20140312230639-09nxw5qqax6dlcqh"
 		}
 	]
 }
