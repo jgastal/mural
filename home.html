@@ -3,11 +3,10 @@
 		<title>{{.title}}</title>
 	</head>
 	<body>
-		{{if .ps}}<h1>{{.ps}}</h1>{{end}}
-		<ul>
-			{{range .envs}}
-				<li>{{.}}</li>
-			{{end}}
-		</ul>
+		<form method="POST">
+			<input type="text" name="name" placeholder="Your name" /><br/>
+			<textarea name="message" placeholder="Whatever you want to say"></textarea><br/>
+			<input type="submit" value="Post" />
+		</form>
 	</body>
 </html>
