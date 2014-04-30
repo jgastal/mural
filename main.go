@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func hello(resp http.ResponseWriter, req *http.Request) {
+func home(resp http.ResponseWriter, req *http.Request) {
 	conn_params, err := pq.ParseURL(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		panic(err)
@@ -37,7 +37,7 @@ func hello(resp http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", hello)
+	http.HandleFunc("/", home)
 	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
 		panic(err)
