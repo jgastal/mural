@@ -62,7 +62,7 @@ func home(resp http.ResponseWriter, req *http.Request) {
 	conn.Close()
 
 	ctx := map[string]interface{}{
-		"title": "How about them apples?!",
+		"title": "How do you like them apples?!",
 		"messages": messages[:msg_count],
 	}
 
