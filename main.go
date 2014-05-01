@@ -47,7 +47,7 @@ func home(resp http.ResponseWriter, req *http.Request) {
 	var messages [10]message
 	msg_count := 0
 	iter := collection.Find(nil).Sort("-time").Batch(10).Iter()
-	for iter.Next(&messages[msg_count]) && msg_count < 10 {
+	for msg_count < 10 && iter.Next(&messages[msg_count]) {
 		msg_count += 1
 	}
 	if err := iter.Close(); err != nil {
