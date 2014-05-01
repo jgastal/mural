@@ -35,6 +35,8 @@ func home(resp http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
+		session.Close()
+		return
 	}
 
 	home, err := template.ParseFiles("home.html")

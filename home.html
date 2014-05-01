@@ -27,7 +27,7 @@
 					<div class="panel-heading"  data-toggle="collapse" data-parent="#share-panel" href="#collapseOne"><span class="h4">Got something to share?</span><span class="glyphicon glyphicon-plus-sign pull-right"></span></div>
 					<div id="collapseOne" class="panel-collapse collapse">
 						<div class="panel-body">
-							<form method="POST" role="form">
+							<form id="post-form" method="POST" role="form">
 								<div class="form-group">
 									<label for="name">Your name</label>
 									<input type="text" class="form-control" id="name" name="name" placeholder="John Doe" /><br/>
@@ -64,6 +64,7 @@
 		<!-- Include all compiled plugins (below), or include individual files as needed -->
 		<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.form/3.49/jquery.form.js"></script>
 		<script>
 			$(document).ready(function() {
 				// Timeago doesn't play well with go's default time format
@@ -71,6 +72,8 @@
 					$(this).attr('datetime', $(this).attr('datetime').replace(' ', 'T').replace(' ', 'Z'));
 				});
 				$('time.pretty').timeago();
+
+				$('#post-form').ajaxForm(function() { $('#post-form').trigger("reset"); });
 			});
 		</script>
 	</body>
