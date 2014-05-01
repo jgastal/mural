@@ -1,0 +1,4 @@
+<div class="well well-sm">
+	<p>{{Message}}</p>
+	<footer class="text-right small">by {{Name}} <time class="pretty" datetime="{{Time}}"></time></footer>
+</div>

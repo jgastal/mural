@@ -3,6 +3,11 @@
 	"GoVersion": "go1.2.1",
 	"Deps": [
 		{
+			"ImportPath": "code.google.com/p/go.net/websocket",
+			"Comment": "null-123",
+			"Rev": "424a15ce8b2f02f6324f2727c5fde92875f62990"
+		},
+		{
 			"ImportPath": "labix.org/v2/mgo",
 			"Comment": "274",
 			"Rev": "gustavo@niemeyer.net-20140312230639-09nxw5qqax6dlcqh"

@@ -47,7 +47,7 @@
 					<div class="panel-heading">
 						<span class="h4">What's happening near you:</span>
 					</div>
-					<div class="panel-body">
+					<div id="msg-container" class="panel-body">
 						{{range .messages}}
 							<div class="well well-sm">
 								<p>{{.Message}}</p>
@@ -65,6 +65,7 @@
 		<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.form/3.49/jquery.form.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js"></script>
 		<script>
 			$(document).ready(function() {
 				// Timeago doesn't play well with go's default time format
@@ -74,6 +75,19 @@
 				$('time.pretty').timeago();
 
 				$('#post-form').ajaxForm(function() { $('#post-form').trigger("reset"); });
+
+				var msg_template;
+				$.get('msg.mst', function(contents) {
+					msg_template = contents;
+					Mustache.parse(msg_template);
+				});
+				var ws = new WebSocket("wss://globalmural.herokuapp.com/websocket/");
+				ws.onmessage = function (event) {
+					console.log("Got new message: " + event.data);
+					var msg = JSON.parse(event.data);
+					$('#msg-container').prepend(Mustache.render(msg_template, msg));
+					$('time.pretty').timeago();
+				}
 			});
 		</script>
 	</body>

@@ -1,17 +1,43 @@
 package main
 
 import (
+	"code.google.com/p/go.net/websocket"
+	"container/list"
 	"html/template"
 	"labix.org/v2/mgo"
+	"log"
 	"net/http"
 	"os"
 	"time"
 )
 
+var clients = list.New()
+
 type message struct {
 	Name    string
 	Message string
 	Time    time.Time
+}
+
+func newClient(ws *websocket.Conn) {
+	el := clients.PushBack(ws)
+	log.Printf("Got a new client %p, now have: %d clients", ws, clients.Len())
+
+	// Monitor the connection and remove from clients list when it closes
+	var buf [64]byte
+	for {
+		if _, err := ws.Read(buf[:]); err != nil {
+			clients.Remove(el)
+		}
+	}
+}
+
+func notifyUsers(msg message) {
+	for e := clients.Front(); e != nil; e = e.Next() {
+		ws := e.Value.(*websocket.Conn)
+		log.Printf("Notifying user %p of new message", ws)
+		go websocket.JSON.Send(ws, msg)
+	}
 }
 
 func home(resp http.ResponseWriter, req *http.Request) {
@@ -31,11 +57,13 @@ func home(resp http.ResponseWriter, req *http.Request) {
 		if msg == "" {
 			msg = "Gosh, nothing to say?!"
 		}
-		err = collection.Insert(message{name, msg, time.Now()})
+		m := message{name, msg, time.Now()}
+		err = collection.Insert(m)
 		if err != nil {
 			panic(err)
 		}
 		session.Close()
+		go notifyUsers(m)
 		return
 	}
 
@@ -64,6 +92,11 @@ func home(resp http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	http.Handle("/websocket/", websocket.Handler(newClient))
+
+	http.HandleFunc("/msg.mst", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "msg.mst")
+	})
 	http.HandleFunc("/", home)
 	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
