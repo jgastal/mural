@@ -9,9 +9,9 @@ import (
 )
 
 type message struct {
-	Name string
+	Name    string
 	Message string
-	Time time.Time
+	Time    time.Time
 }
 
 func home(resp http.ResponseWriter, req *http.Request) {
@@ -54,12 +54,11 @@ func home(resp http.ResponseWriter, req *http.Request) {
 	session.Close()
 
 	ctx := map[string]interface{}{
-		"title": "How do you like them apples?!",
+		"title":    "How do you like them apples?!",
 		"messages": messages[:msg_count],
 	}
 
 	home.Execute(resp, ctx)
-	
 }
 
 func main() {
