@@ -1,8 +1,8 @@
 package main
 
 import (
-	"code.google.com/p/go.net/websocket"
 	"container/list"
+	"github.com/gorilla/websocket"
 	"html/template"
 	"labix.org/v2/mgo"
 	"log"
@@ -10,6 +10,8 @@ import (
 	"os"
 	"time"
 )
+
+var upgrader = websocket.Upgrader{}
 
 var clients = list.New()
 
@@ -19,14 +21,18 @@ type message struct {
 	Time    time.Time
 }
 
-func newClient(ws *websocket.Conn) {
+func newClient(w http.ResponseWriter, r *http.Request) {
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		panic(err)
+	}
+
 	el := clients.PushBack(ws)
 	log.Printf("Got a new client %p, now have: %d clients", ws, clients.Len())
 
 	// Monitor the connection and remove from clients list when it closes
-	var buf [64]byte
 	for {
-		if _, err := ws.Read(buf[:]); err != nil {
+		if err = ws.ReadJSON(nil); err != nil {
 			clients.Remove(el)
 		}
 	}
@@ -36,7 +42,7 @@ func notifyUsers(msg message) {
 	for e := clients.Front(); e != nil; e = e.Next() {
 		ws := e.Value.(*websocket.Conn)
 		log.Printf("Notifying user %p of new message", ws)
-		go websocket.JSON.Send(ws, msg)
+		go websocket.WriteJSON(ws, msg)
 	}
 }
 
@@ -92,7 +98,7 @@ func home(resp http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	http.Handle("/websocket/", websocket.Handler(newClient))
+	http.HandleFunc("/websocket/", newClient)
 
 	http.HandleFunc("/msg.mst", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "msg.mst")
