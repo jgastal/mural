@@ -46,7 +46,7 @@ func notifyUsers(msg message) {
 	}
 }
 
-func home(resp http.ResponseWriter, req *http.Request) {
+func postMessage(resp http.ResponseWriter, req *http.Request) {
 	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
 	if err != nil {
 		panic(err)
@@ -54,24 +54,34 @@ func home(resp http.ResponseWriter, req *http.Request) {
 	db := session.DB("")
 	collection := db.C("posts")
 
-	if req.Method == "POST" {
-		name := req.FormValue("name")
-		if name == "" {
-			name = "Anonymous coward"
-		}
-		msg := req.FormValue("message")
-		if msg == "" {
-			msg = "Gosh, nothing to say?!"
-		}
-		m := message{name, msg, time.Now()}
-		err = collection.Insert(m)
-		if err != nil {
-			panic(err)
-		}
-		session.Close()
-		go notifyUsers(m)
+	if req.Method != "POST" {
 		return
 	}
+
+	name := req.FormValue("name")
+	if name == "" {
+		name = "Anonymous coward"
+	}
+	msg := req.FormValue("message")
+	if msg == "" {
+		msg = "Gosh, nothing to say?!"
+	}
+	m := message{name, msg, time.Now()}
+	err = collection.Insert(m)
+	if err != nil {
+		panic(err)
+	}
+	session.Close()
+	go notifyUsers(m)
+}
+
+func home(resp http.ResponseWriter, req *http.Request) {
+	session, err := mgo.Dial(os.Getenv("MONGOHQ_URL"))
+	if err != nil {
+		panic(err)
+	}
+	db := session.DB("")
+	collection := db.C("posts")
 
 	home, err := template.ParseFiles("home.html")
 	if err != nil {
@@ -103,6 +113,7 @@ func main() {
 	http.HandleFunc("/msg.mst", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "msg.mst")
 	})
+	http.HandleFunc("/post/message/", postMessage)
 	http.HandleFunc("/", home)
 	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
