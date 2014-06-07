@@ -34,6 +34,7 @@ func newClient(w http.ResponseWriter, r *http.Request) {
 	for {
 		if err = ws.ReadJSON(nil); err != nil {
 			clients.Remove(el)
+			return
 		}
 	}
 }
